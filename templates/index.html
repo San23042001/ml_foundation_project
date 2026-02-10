@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Student Performance Predictor</title>
+
+    <!-- Liquid theme CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/liquid.css') }}">
+</head>
+
+<body>
+    <div class="login">
+        <h1>Welcome 👋</h1>
+
+        <p style="text-align:center; color:#f1f1f1; margin-bottom:25px; font-size:15px;">
+            Predict student maths performance using machine learning.<br>
+            Enter academic and demographic details to get accurate predictions.
+        </p>
+
+        <!-- Redirect Button -->
+        <a href="{{ url_for('predict_datapoint') }}" style="text-decoration:none;">
+            <button class="btn">
+                Go to Prediction Page 🚀
+            </button>
+        </a>
+    </div>
+</body>
+</html>
