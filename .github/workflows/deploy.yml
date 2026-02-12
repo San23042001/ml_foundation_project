@@ -1,0 +1,42 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker image
+      run: docker build -t math-app .
+
+    - name: Save SSH key
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+        chmod 600 key.pem
+
+    - name: Deploy to EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          docker stop math-app || true
+          docker rm math-app || true
+          docker rmi math-app || true
+        EOF
+
+    - name: Copy project to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -i key.pem -r . ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/app
+
+    - name: Run container on EC2
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          cd /home/ubuntu/app
+          docker build -t math-app .
+          docker run -d -p 8000:8000 --name math-app math-app
+        EOF
